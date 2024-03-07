@@ -14,50 +14,18 @@ public class CharacterMovement : MonoBehaviour
     private Animator animator;
     private bool isWalking;
 
-    public static class AnimationConsts
+    public static class AnimationIntHash
     {
-        public static readonly int IsWalk = Animator.StringToHash("isWalk");
-        public static readonly int IsRunning = Animator.StringToHash("isRunning");
-        public static readonly int DWARF_WALK = Animator.StringToHash("Dwarf Walk");
-        // private static readonly int IsWalk = Animator.StringToHash("isWalk");
-        // private static readonly int IsWalk = Animator.StringToHash("isWalk");
-        // private static readonly int IsWalk = Animator.StringToHash("isWalk");
-        // private static readonly int IsWalk = Animator.StringToHash("isWalk");
-        // private static readonly int IsWalk = Animator.StringToHash("isWalk");
-    }
-
-    public class AnimationManager
-    {
-        private static AnimationManager instance;
-
-        // 프로퍼티
-        public static AnimationManager Instance
-        {
-            get
-            {
-                if (instance == null)
-                    instance = new AnimationManager();
-                
-                return instance;
-            }
-        }
-
-        public void SetBool(Animator animator, int id, bool value)
-        {
-            animator.SetBool(id, value);
-        }
-
-        public void Play(Animator animator, int stateHash, int layer)
-        {
-            animator.enabled = true;
-            animator.Play(stateHash,layer);
-        }
+        public static readonly int IS_WALK = Animator.StringToHash("isWalk");
+        public static readonly int IS_RUNNING = Animator.StringToHash("isRunning");
         
-        public void Stop(Animator animator)
-        {
-            animator.enabled = false;
-        }
+        public static readonly int JUMP = Animator.StringToHash("Jump");
+        public static readonly int DWARF_WALK = Animator.StringToHash("Dwarf Walk");
+        public static readonly int IDLE = Animator.StringToHash("Idle");
+        public static readonly int WALK = Animator.StringToHash("Walk");
+        public static readonly int DASH = Animator.StringToHash("Dash");
     }
+    
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -81,7 +49,7 @@ public class CharacterMovement : MonoBehaviour
 
         if (moveDirection.magnitude > 0.3f && isWalking == false)
         {
-            AnimationManager.Instance.Play(animator, AnimationConsts.DWARF_WALK, 0);
+            AnimationManager.Instance.Play(animator, AnimationIntHash.DWARF_WALK, 0);
             isWalking = true;
         }
         else
