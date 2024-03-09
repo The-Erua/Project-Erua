@@ -4,10 +4,11 @@ using UnityEngine;
 
 public enum AnimationType
 {
+    None =-1,
     SelfInterruptable = 0,
     NonSelfInterruptable = 1,
 }
-public class AnimationState
+public struct AnimationState
 {
 
     public AnimationType Type { get; set; }

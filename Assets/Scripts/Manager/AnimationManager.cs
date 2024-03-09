@@ -16,7 +16,7 @@ public class AnimationManager: Singleton<AnimationManager>
     public void Play(Animator animator, int stateHash, int layer)
     {
         animator.enabled = true;
-        animator.Play(stateHash,layer);
+        animator.Play(stateHash,layer,0f);
     }
         
 }

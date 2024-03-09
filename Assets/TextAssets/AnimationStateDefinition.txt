@@ -1,0 +1,8 @@
+Walk, 1
+Roll, 1
+Jump, 1
+Backwards, 1
+SneakingForward, 1
+StandingDeathRight, 1
+Idle, 1
+Dash, 1
