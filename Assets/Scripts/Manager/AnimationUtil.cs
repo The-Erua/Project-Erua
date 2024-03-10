@@ -19,7 +19,7 @@ public class AnimationUtil : MonoBehaviour
         }
         else
         {
-            AnimationManager.Instance.Play(animator, newState.animationHash, 0);
+            AnimationManager.Instance.CrossFade(animator, 0.1f, newState.animationHash, 0);
             return true;
         }
     }

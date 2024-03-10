@@ -18,5 +18,11 @@ public class AnimationManager: Singleton<AnimationManager>
         animator.enabled = true;
         animator.Play(stateHash,layer,0f);
     }
+    
+    public void CrossFade(Animator animator, float crossfadeTime, int stateHash, int layer)
+    {
+        animator.enabled = true;
+        animator.CrossFade(stateHash, crossfadeTime, layer,0f);
+    }
         
 }
