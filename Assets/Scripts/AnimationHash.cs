@@ -9,5 +9,5 @@ public class AnimationHash
    public static readonly int SNEAKINGFORWARD = Animator.StringToHash("SneakingForward");
    public static readonly int STANDINGDEATHRIGHT = Animator.StringToHash("StandingDeathRight");
    public static readonly int IDLE = Animator.StringToHash("Idle");
-   public static readonly int DASH = Animator.StringToHash("Dash");
+   public static readonly int RUN = Animator.StringToHash("Run");
 }

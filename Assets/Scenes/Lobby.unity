@@ -476,12 +476,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.00013985172, y: -0.9986956, z: 0.05098728, w: 0.0027018776}
-  m_LocalPosition: {x: -0.19263941, y: 1.0899248, z: 1.5403247}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0.23712794, y: -0.0026171748, z: 0.00066504366, w: -0.9714747}
+  m_LocalPosition: {x: 0.08816441, y: 2.3424737, z: -2.2418032}
+  m_LocalScale: {x: 1.111111, y: 1.1111113, z: 1.1111112}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1505184842}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &330585547
 MonoBehaviour:
@@ -540,14 +540,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 1505184842}
-  distance: 5
+  offset: {x: 0, y: 2, z: -3}
   zoomSpeed: 2
-  minDistance: 2
-  maxDistance: 10
-  xSpeed: 120
-  ySpeed: 120
-  yMinLimit: -20
-  yMaxLimit: 70
+  minZoom: 0.5
+  maxZoom: 2
+  minYaw: -40
+  maxYaw: 80
+  yawSpeed: 100
+  pitchSpeed: 35
+  minPitch: 30
+  maxPitch: 90
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -983,7 +985,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 5978625272225700269, guid: 3048c38c0f6f71b478cf3bdf6dd51425,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 330585546}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 1376786139935276727, guid: 3048c38c0f6f71b478cf3bdf6dd51425,
         type: 3}
@@ -1215,7 +1221,6 @@ Rigidbody:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 330585546}
   - {fileID: 410087041}
   - {fileID: 731890241}
   - {fileID: 807476980}

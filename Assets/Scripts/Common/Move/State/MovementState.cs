@@ -14,49 +14,47 @@ public class JumpState : IMovementState
 {
     public void HandleInput(HandleManager handleManager)
     {
-        if (AnimationUtil.IsAnimationEnd(handleManager.animator))
-        {
-            AnimationStateTableManager.Instance.TryGetAnimationState(out AnimationState newState, AnimationHash.IDLE);
-            handleManager.ChangeMovementState(new IdleState());
-        }
+        AnimationUtil.IdleWhenGround(handleManager);
     }
 
     public void ExecuteMovement(Rigidbody playerRb)
     {
-        if(Input.GetKeyDown(KeyCode.Space))
-            playerRb.AddForce(Vector3.up * HandleManager.Instance.impulseVal, ForceMode.Impulse);
+        AnimationUtil.DoJumpWhenSpaceAndGrounded(playerRb);
     }
 
     public void TryPlayAnimation(HandleManager mgr)
     {
-        if(AnimationUtil.HandleAnimation(mgr.animator, mgr.prevAnimState, AnimationHash.JUMP))
-        {
-            AnimationStateTableManager.Instance.TryGetAnimationState(out AnimationState newState, AnimationHash.JUMP);
-            mgr.ChangeAnimState(newState);
-        }
+        AnimationUtil.TryGetAndChangeAnimState(mgr, AnimationHash.JUMP);
     }
 }
 
-public class DashState : IMovementState
+public class RunState : IMovementState
 {
     public void HandleInput(HandleManager handleManager)
     {
+        if (AnimationUtil.JumpWhenSpaceAndGrounded(handleManager)) 
+            return;
         
+        if (AnimationUtil.WalkWhenMovingButNoShift(handleManager))
+            return;
+        
+        if (AnimationUtil.IdleWhenNoMove(handleManager))
+            return;
     }
 
     public void ExecuteMovement(Rigidbody playerRb)
     {
+        var moveDir = HandleManager.Instance.moveDir * HandleManager.Instance.speedMultiplier;
+        AnimationUtil.DoMove(playerRb, moveDir);
     }
 
     public void TryPlayAnimation(HandleManager mgr)
     {
-        if(AnimationUtil.HandleAnimation(mgr.animator, mgr.prevAnimState, AnimationHash.DASH))
-        {
-            AnimationStateTableManager.Instance.TryGetAnimationState(out AnimationState newState, AnimationHash.DASH);
-            mgr.ChangeAnimState(newState);
-        }
+        if (AnimationUtil.ReapeatAnimation(mgr, AnimationHash.RUN)) 
+            return;
+
+        AnimationUtil.TryGetAndChangeAnimState(mgr, AnimationHash.RUN);
     }
-    
 }
 
 
@@ -64,40 +62,31 @@ public class WalkState : IMovementState
 {
     public void HandleInput(HandleManager handleManager)
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            AnimationStateTableManager.Instance.TryGetAnimationState(out AnimationState newState, AnimationHash.JUMP);
-            handleManager.ChangeMovementState(new JumpState());
+        if (AnimationUtil.JumpWhenSpaceAndGrounded(handleManager)) 
             return;
-        }
 
-        if (handleManager.moveDir.magnitude < 0.3f)
-        {
-            AnimationStateTableManager.Instance.TryGetAnimationState(out AnimationState newState, AnimationHash.IDLE);
-            handleManager.ChangeMovementState(new IdleState());
-        }
-            
+        if (AnimationUtil.RunWhenMovingAndShift(handleManager)) 
+            return;
+
+        if (AnimationUtil.IdleWhenNoMove(handleManager))
+            return;
+
     }
 
     public void ExecuteMovement(Rigidbody playerRb)
     {
         var moveDir = HandleManager.Instance.moveDir;
-        if (moveDir.magnitude > 0.3f)
-        {
-            Quaternion targetRotation = Quaternion.LookRotation(moveDir);
-            playerRb.rotation = targetRotation;
-
-            playerRb.velocity = moveDir;
-        }
+        AnimationUtil.DoMove(playerRb, moveDir);
     }
+
 
     public void TryPlayAnimation(HandleManager mgr)
     {
-        if(AnimationUtil.HandleAnimation(mgr.animator, mgr.prevAnimState, AnimationHash.WALK))
-        {
-            AnimationStateTableManager.Instance.TryGetAnimationState(out AnimationState newState, AnimationHash.WALK);
-            mgr.ChangeAnimState(newState);
-        }
+        if (AnimationUtil.ReapeatAnimation(mgr, AnimationHash.WALK)) 
+            return;
+
+        AnimationUtil.TryGetAndChangeAnimState(mgr, AnimationHash.WALK);
+
     }
 }
 
@@ -105,17 +94,14 @@ public class IdleState : IMovementState
 {
     public void HandleInput(HandleManager handleManager)
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            AnimationStateTableManager.Instance.TryGetAnimationState(out AnimationState newState, AnimationHash.JUMP);
-            handleManager.ChangeMovementState(new JumpState());
+        if (AnimationUtil.JumpWhenSpaceAndGrounded(handleManager))
             return;
-        }
        
-        if(handleManager.moveDir.magnitude>0.3f){  
-            AnimationStateTableManager.Instance.TryGetAnimationState(out AnimationState newState, AnimationHash.WALK);
-            handleManager.ChangeMovementState(new WalkState());
-        }
+        if (AnimationUtil.RunWhenMovingAndShift(handleManager)) 
+            return;
+        
+        if(AnimationUtil.WalkWhenMoving(handleManager))
+            return;
             
     }
 
@@ -125,17 +111,9 @@ public class IdleState : IMovementState
 
     public void TryPlayAnimation(HandleManager mgr)
     {
-        if (AnimationUtil.IsAnimationEnd(mgr.animator))
-        {
-            AnimationStateTableManager.Instance.TryGetAnimationState(out AnimationState newState, AnimationHash.IDLE);
-            AnimationManager.Instance.Play(mgr.animator, newState.animationHash, 0);
-            return;
-        }
-        
-        if(AnimationUtil.HandleAnimation(mgr.animator, mgr.prevAnimState, AnimationHash.IDLE))
-        {
-            AnimationStateTableManager.Instance.TryGetAnimationState(out AnimationState newState, AnimationHash.IDLE);
-            mgr.ChangeAnimState(newState);
-        }
+        if (AnimationUtil.ReapeatAnimation(mgr, AnimationHash.IDLE)) return;
+
+        AnimationUtil.TryGetAndChangeAnimState(mgr, AnimationHash.IDLE);
+
     }
 }

@@ -9,8 +9,10 @@ public class HandleManager: MonoBehaviourSingleton<HandleManager>
     public Rigidbody playerRb;
     public Animator animator;
     public AnimationState prevAnimState;
-    public float impulseVal = 0.78f;
+    internal float impulseVal = 3.78f;
     public Vector3 moveDir;
+    internal float speedMultiplier = 3f;
+    public bool isGrounded;
 
     public void SetPlayer(Rigidbody playerRb, Animator animator)
     {
@@ -28,12 +30,14 @@ public class HandleManager: MonoBehaviourSingleton<HandleManager>
         state.ExecuteMovement(playerRb);
         state.TryPlayAnimation(this);
     }
-    
+
     public void ChangeMovementState(IMovementState newState) => state = newState;
     public void ChangeAnimState(AnimationState newAnimState) => prevAnimState = newAnimState;
+    public void SetGround(bool isGrounded) => this.isGrounded = isGrounded;
 
     public void SetMoveDir(Vector3 moveDir)
     {
         this.moveDir = moveDir;
     }
+
 }

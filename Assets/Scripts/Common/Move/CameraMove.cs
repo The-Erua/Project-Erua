@@ -1,65 +1,53 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraMove : MonoBehaviour
+public class CameraMovement : MonoBehaviour
 {
     public Transform target; // 캐릭터의 Transform
-    public float distance = 5.0f; // 캐릭터로부터의 카메라 거리
-    public float zoomSpeed = 2.0f; // 줌 인/아웃 속도
-    public float minDistance = 2.0f; // 최소 거리
-    public float maxDistance = 10.0f; // 최대 거리
-    public float xSpeed = 120.0f; // X축 회전 속도
-    public float ySpeed = 120.0f; // Y축 회전 속도
-    public float yMinLimit = -20f; // 아래 각도 제한
-    public float yMaxLimit = 70f; // 위 각도 제한
-    private float x = 0.0f;
-    private float y = 0.0f;
+    public Vector3 offset = new Vector3(0, 5, -10); // 캐릭터 대비 카메라의 위치
+    public float zoomSpeed = 4f; // 줌 속도
+    public float minZoom = 5f; // 최소 줌 거리
+    public float maxZoom = 15f; // 최대 줌 거리
+    public float minYaw = -40f; // 최소 pitch 각도, 이 값은 사용하지 않으므로 삭제 또는 주석 처리
+    public float maxYaw = 80f; // 최대 pitch 각도, 이 값도 마찬가지로 수정될 예정
+    public float yawSpeed = 100f; // 카메라 회전 속도
+    public float pitchSpeed = 2f; // 카메라 pitch 조정 속도
+    public float minPitch = -30f; // 카메라가 내려다볼 수 있는 최소 각도 (아래 방향)
+    public float maxPitch = 60f; // 카메라가 올려다볼 수 있는 최대 각도 (위 방향)
+
+    private float currentZoom = 10f; // 현재 줌 거리
+    private float currentYaw = 0f; // 현재 Yaw 값 (회전)
+    private float currentPitch = 0f; // 현재 Pitch 값
 
     void Start()
     {
-        Vector3 angles = transform.eulerAngles;
-        x = angles.y;
-        y = angles.x;
-
-        // 커서 숨기기 및 잠그기 (선택적)
+        // 마우스 커서 고정
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
 
-    void LateUpdate()
+    void Update()
     {
-        if (target)
-        {
-            x += Input.GetAxis("Mouse X") * xSpeed * distance * 0.02f;
-            y -= Input.GetAxis("Mouse Y") * ySpeed * 0.02f;
+        // 줌 인/아웃
+        currentZoom -= Input.GetAxis("Mouse ScrollWheel") * zoomSpeed;
+        currentZoom = Mathf.Clamp(currentZoom, minZoom, maxZoom);
 
-            y = ClampAngle(y, yMinLimit, yMaxLimit);
-
-            Quaternion rotation = Quaternion.Euler(y, x, 0);
-
-            distance = Mathf.Clamp(distance - Input.GetAxis("Mouse ScrollWheel") * zoomSpeed, minDistance, maxDistance);
-
-            RaycastHit hit;
-            if (Physics.Linecast(target.position, transform.position, out hit))
-            {
-                distance -= hit.distance;
-            }
-
-            Vector3 negDistance = new Vector3(0.0f, 0.0f, -distance);
-            Vector3 position = rotation * negDistance + target.position;
-
-            transform.rotation = rotation;
-            transform.position = position;
-        }
+        // 마우스 이동으로 카메라 회전 (마우스 클릭 없이)
+        currentYaw += Input.GetAxis("Mouse X") * yawSpeed * Time.deltaTime;
+        
+        // 마우스 위/아래 움직임으로 Pitch 조정
+        currentPitch -= Input.GetAxis("Mouse Y") * pitchSpeed * Time.deltaTime; // Y축 반전 제거
+        currentPitch = Mathf.Clamp(currentPitch, minPitch, maxPitch);
     }
 
-    public static float ClampAngle(float angle, float min, float max)
+    void LateUpdate()
     {
-        if (angle < -360F)
-            angle += 360F;
-        if (angle > 360F)
-            angle -= 360F;
-        return Mathf.Clamp(angle, min, max);
+        // 카메라 위치 업데이트
+        Vector3 newPos = target.position - offset * currentZoom;
+        transform.position = newPos;
+
+        // 카메라를 대상을 향해 회전시키고, 추가로 Yaw와 Pitch 회전 적용
+        transform.LookAt(target.position + Vector3.up * 2f); // 카메라가 항상 대상을 바라보도록 기준 설정
+        transform.RotateAround(target.position, Vector3.up, currentYaw);
+        transform.RotateAround(target.position, transform.right, currentPitch);
     }
 }

@@ -118,8 +118,16 @@ public class Player : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground"))
         {
             isGrounded = true;
+            HandleManager.Instance.SetGround(isGrounded);
         }
-
+    }
     
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            isGrounded = false;
+            HandleManager.Instance.SetGround(isGrounded);
+        }
     }
 }

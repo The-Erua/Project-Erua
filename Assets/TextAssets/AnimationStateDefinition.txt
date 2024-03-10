@@ -5,4 +5,4 @@ Backwards, 1
 SneakingForward, 1
 StandingDeathRight, 1
 Idle, 1
-Dash, 1
+Run, 1
