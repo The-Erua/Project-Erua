@@ -12,15 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf2edee5c58d82540a51f03df9d42094, type: 3}
   m_Name: URP-Performant
   m_EditorClassIdentifier: 
-  k_AssetVersion: 11
-  k_AssetPreviousVersion: 11
+  k_AssetVersion: 12
+  k_AssetPreviousVersion: 12
   m_RendererType: 1
   m_RendererData: {fileID: 0}
   m_RendererDataList:
   - {fileID: 11400000, guid: 707360a9c581a4bd7aa53bfeb1429f71, type: 2}
   m_DefaultRendererIndex: 0
   m_RequireDepthTexture: 0
-  m_RequireOpaqueTexture: 0
+  m_RequireOpaqueTexture: 1
   m_OpaqueDownsampling: 1
   m_SupportsTerrainHoles: 0
   m_SupportsHDR: 0
@@ -35,7 +35,6 @@ MonoBehaviour:
   m_ShEvalMode: 1
   m_LightProbeSystem: 0
   m_ProbeVolumeMemoryBudget: 1024
-  m_ProbeVolumeBlendingMemoryBudget: 128
   m_SupportProbeVolumeStreaming: 0
   m_ProbeVolumeSHBands: 1
   m_MainLightRenderingMode: 1
@@ -123,6 +122,10 @@ MonoBehaviour:
   m_PrefilterDBufferMRT1: 0
   m_PrefilterDBufferMRT2: 0
   m_PrefilterDBufferMRT3: 0
+  m_PrefilterSoftShadowsQualityLow: 0
+  m_PrefilterSoftShadowsQualityMedium: 0
+  m_PrefilterSoftShadowsQualityHigh: 0
+  m_PrefilterSoftShadows: 0
   m_PrefilterScreenCoord: 0
   m_PrefilterNativeRenderPass: 0
   m_ShaderVariantLogLevel: 0
