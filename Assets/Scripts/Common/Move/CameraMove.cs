@@ -2,52 +2,86 @@ using UnityEngine;
 
 public class CameraMovement : MonoBehaviour
 {
-    public Transform target; // 캐릭터의 Transform
-    public Vector3 offset = new Vector3(0, 5, -10); // 캐릭터 대비 카메라의 위치
-    public float zoomSpeed = 4f; // 줌 속도
-    public float minZoom = 5f; // 최소 줌 거리
-    public float maxZoom = 15f; // 최대 줌 거리
-    public float minYaw = -40f; // 최소 pitch 각도, 이 값은 사용하지 않으므로 삭제 또는 주석 처리
-    public float maxYaw = 80f; // 최대 pitch 각도, 이 값도 마찬가지로 수정될 예정
-    public float yawSpeed = 100f; // 카메라 회전 속도
-    public float pitchSpeed = 2f; // 카메라 pitch 조정 속도
-    public float minPitch = -30f; // 카메라가 내려다볼 수 있는 최소 각도 (아래 방향)
-    public float maxPitch = 60f; // 카메라가 올려다볼 수 있는 최대 각도 (위 방향)
+    public Transform target;
+    public Vector3 offset = new Vector3(0, 5, -10);
+    public float zoomSpeed = 4f;
+    public float minZoom = 5f;
+    public float maxZoom = 15f;
+    // minYaw와 maxYaw는 사용하지 않으므로 삭제합니다.
+    public float yawSpeed = 100f;
+    public float pitchSpeed = 2f;
+    public float minPitch = -30f;
+    public float maxPitch = 60f;
 
-    private float currentZoom = 10f; // 현재 줌 거리
-    private float currentYaw = 0f; // 현재 Yaw 값 (회전)
-    private float currentPitch = 0f; // 현재 Pitch 값
-
+    private float currentZoom = 10f;
+    private float currentYaw = 0f;
+    private float currentPitch = 0f;
+    private bool isForcedZoom = false; // 강제 줌인 상태 플래그
+    public float forcedZoomTarget = 1f; // 강제 줌인 시 목표 줌 값
+    public float forcedZoomAmount = 1f; // 강제 줌인할 때의 목표 줌 값
+    private float targetZoom; // 목표 줌 값을 저장하는 변수
+    private float zoomLerpSpeed = 5f; // 줌이 원래 값으로 돌아가는데 사용되는 보간 속도
+    private float originalPoint = 0f;
     void Start()
     {
-        // 마우스 커서 고정
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+        targetZoom = currentZoom; // 초기 목표 줌 값을 현재 줌 값으로 설정
     }
 
     void Update()
     {
-        // 줌 인/아웃
-        currentZoom -= Input.GetAxis("Mouse ScrollWheel") * zoomSpeed;
-        currentZoom = Mathf.Clamp(currentZoom, minZoom, maxZoom);
+        if (isForcedZoom)
+        {
+            // 강제 줌인 상태
+            currentZoom = Mathf.Lerp(currentZoom, forcedZoomAmount, Time.deltaTime * zoomSpeed);
+        }
+        else if (!isForcedZoom && StillFar())
+        {
+            // 강제 줌인이 해제되고, 원래 줌 값으로 천천히 돌아감
+            currentZoom = Mathf.Lerp(currentZoom, targetZoom, Time.deltaTime * zoomLerpSpeed);
+        }
+        else
+        {
+            // 정상적인 줌 조절
+            float scroll = Input.GetAxis("Mouse ScrollWheel");
+            if (scroll != 0f)
+            {
+                targetZoom -= scroll * zoomSpeed;
+                targetZoom = Mathf.Clamp(targetZoom, minZoom, maxZoom);
+            }
+        }
 
-        // 마우스 이동으로 카메라 회전 (마우스 클릭 없이)
-        currentYaw += Input.GetAxis("Mouse X") * yawSpeed * Time.deltaTime;
+        // 마우스 이동으로 카메라 회전
+        float modifiedYawSpeed = isForcedZoom ? yawSpeed * 0.5f : yawSpeed;
+        currentYaw += Input.GetAxis("Mouse X") * modifiedYawSpeed * Time.deltaTime;
         
         // 마우스 위/아래 움직임으로 Pitch 조정
-        currentPitch -= Input.GetAxis("Mouse Y") * pitchSpeed * Time.deltaTime; // Y축 반전 제거
+        float modifiedPitchSpeed = isForcedZoom ? pitchSpeed * 0.5f : pitchSpeed;
+        currentPitch -= Input.GetAxis("Mouse Y") * modifiedPitchSpeed * Time.deltaTime;
         currentPitch = Mathf.Clamp(currentPitch, minPitch, maxPitch);
+    }
+
+    private bool StillFar()
+    {
+        var result = Mathf.Abs(currentZoom - targetZoom) > 0.1f;
+        if (!result)
+            targetZoom = currentZoom;
+        return result;
     }
 
     void LateUpdate()
     {
-        // 카메라 위치 업데이트
         Vector3 newPos = target.position - offset * currentZoom;
         transform.position = newPos;
 
-        // 카메라를 대상을 향해 회전시키고, 추가로 Yaw와 Pitch 회전 적용
-        transform.LookAt(target.position + Vector3.up * 2f); // 카메라가 항상 대상을 바라보도록 기준 설정
+        transform.LookAt(target.position + Vector3.up * 2f);
         transform.RotateAround(target.position, Vector3.up, currentYaw);
         transform.RotateAround(target.position, transform.right, currentPitch);
+    }
+
+    public void EnableForcedZoom(bool enable)
+    {
+        isForcedZoom = enable;
     }
 }
