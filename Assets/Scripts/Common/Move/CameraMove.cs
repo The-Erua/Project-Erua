@@ -1,9 +1,12 @@
+using System;
 using UnityEngine;
 
 public class CameraMovement : MonoBehaviour
 {
     public Transform target;
+
     public Vector3 offset = new Vector3(0, 5, -10);
+    public Vector3 forcedOffset = new Vector3(5, 0, 0);
     public float zoomSpeed = 4f;
     public float minZoom = 5f;
     public float maxZoom = 15f;
@@ -12,8 +15,8 @@ public class CameraMovement : MonoBehaviour
     public float pitchSpeed = 2f;
     public float minPitch = -30f;
     public float maxPitch = 60f;
-
-    private float currentZoom = 10f;
+    
+    private float currentZoom = 2f;
     private float currentYaw = 0f;
     private float currentPitch = 0f;
     private bool isForcedZoom = false; // 강제 줌인 상태 플래그
@@ -72,14 +75,23 @@ public class CameraMovement : MonoBehaviour
 
     void LateUpdate()
     {
-        Vector3 newPos = target.position - offset * currentZoom;
-        transform.position = newPos;
+        Vector3 newPos;
+        if (isForcedZoom)
+        {
+            // 강제 줌 상태에서는 forcedOffset을 적용합니다.
+            newPos = target.position + forcedOffset - offset * currentZoom;
+        }
+        else
+        {
+            // 정상 상태에서는 기존 로직을 사용합니다.
+            newPos = target.position - offset * currentZoom;
+        }
 
-        transform.LookAt(target.position + Vector3.up * 2f);
+        transform.position = newPos;
+        transform.LookAt(isForcedZoom ? target.position + forcedOffset + Vector3.up * 2f : target.position + Vector3.up * 2f);
         transform.RotateAround(target.position, Vector3.up, currentYaw);
         transform.RotateAround(target.position, transform.right, currentPitch);
     }
-
     public void EnableForcedZoom(bool enable)
     {
         isForcedZoom = enable;

@@ -27,6 +27,27 @@ public class JumpState : IMovementState
         AnimationUtil.TryGetAndChangeAnimState(mgr, AnimationHash.JUMP);
     }
 }
+public class PrayingState : IMovementState
+{
+    public void HandleInput(HandleManager handleManager)
+    {
+        if (AnimationUtil.IdleWhenNoMove_NoMouse1(handleManager))
+            return;
+    }
+
+    public void ExecuteMovement(Rigidbody playerRb)
+    {
+        //DoNothing
+    }
+
+    public void TryPlayAnimation(HandleManager mgr)
+    {
+        if (AnimationUtil.ReapeatAnimation(mgr, AnimationHash.PRAYING)) 
+            return;
+
+        AnimationUtil.TryGetAndChangeAnimState(mgr, AnimationHash.PRAYING);
+    }
+}
 
 public class RunState : IMovementState
 {
@@ -34,10 +55,10 @@ public class RunState : IMovementState
     {
         if (AnimationUtil.JumpWhenSpaceAndGrounded(handleManager)) 
             return;
-        
+        // if (AnimationUtil.PrayingWhenMouse1(handleManager))
+        //     return;
         if (AnimationUtil.WalkWhenMovingButNoShift(handleManager))
             return;
-        
         if (AnimationUtil.IdleWhenNoMove(handleManager))
             return;
     }

@@ -10,4 +10,5 @@ public class AnimationHash
    public static readonly int STANDINGDEATHRIGHT = Animator.StringToHash("StandingDeathRight");
    public static readonly int IDLE = Animator.StringToHash("Idle");
    public static readonly int RUN = Animator.StringToHash("Run");
+   public static readonly int PRAYING = Animator.StringToHash("Praying");
 }

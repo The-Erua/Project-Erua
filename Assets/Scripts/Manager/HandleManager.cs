@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using EditorLog;
@@ -26,9 +27,29 @@ public class HandleManager: MonoBehaviourSingleton<HandleManager>
     {
         if (!playerRb || !animator)
             return;
-        state.HandleInput(this);
-        state.ExecuteMovement(playerRb);
-        state.TryPlayAnimation(this);
+        try
+        {
+            state.HandleInput(this);
+            state.TryPlayAnimation(this);
+        }
+        catch (Exception e)
+        {
+            EditorDebug.LogError(e);
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        if (!playerRb || !animator)
+            return;
+        try
+        {
+            state.ExecuteMovement(playerRb);
+        } 
+        catch (Exception e)
+        {
+            EditorDebug.LogError(e);
+        }
     }
 
     public void ChangeMovementState(IMovementState newState) => state = newState;
