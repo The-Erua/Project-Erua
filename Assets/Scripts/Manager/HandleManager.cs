@@ -13,7 +13,6 @@ public class HandleManager: MonoBehaviourSingleton<HandleManager>
     internal float impulseVal = 3.78f;
     public Vector3 moveDir;
     internal float speedMultiplier = 3f;
-    public bool isGrounded;
 
     public void SetPlayer(Rigidbody playerRb, Animator animator)
     {
@@ -38,7 +37,7 @@ public class HandleManager: MonoBehaviourSingleton<HandleManager>
         }
     }
 
-    private void FixedUpdate()
+    private void LateUpdate()
     {
         if (!playerRb || !animator)
             return;
@@ -54,8 +53,6 @@ public class HandleManager: MonoBehaviourSingleton<HandleManager>
 
     public void ChangeMovementState(IMovementState newState) => state = newState;
     public void ChangeAnimState(AnimationState newAnimState) => prevAnimState = newAnimState;
-    public void SetGround(bool isGrounded) => this.isGrounded = isGrounded;
-
     public void SetMoveDir(Vector3 moveDir)
     {
         this.moveDir = moveDir;

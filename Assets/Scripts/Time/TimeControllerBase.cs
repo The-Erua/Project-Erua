@@ -46,9 +46,9 @@ public class RigidBodyTimeController : TimeControllerBase, ITimeController<Rigid
     public void ControlTimeScale(float timeScaleFactor)
     {
         var player = ControllerableComponent.ControllerableComponent.GetComponent<Player>();
-        var playerVelocity = player.GetComponent<PlayerVelocityManager>();
+        var playerVelocity = player.GetComponent<PlayerMovementManager>();
         var customGravity = player.GetComponent<CustomGravity>();
-        customGravity.timeScale = timeScaleFactor;
+        customGravity.TimeScale = timeScaleFactor;
         originalVelocity = player.GetComponent<Rigidbody>().velocity;
         playerVelocity.ApplySlowMotion(timeScaleFactor);
     }
@@ -57,9 +57,9 @@ public class RigidBodyTimeController : TimeControllerBase, ITimeController<Rigid
     {
         var player = ControllerableComponent.ControllerableComponent.GetComponent<Player>();
         var customGravity = player.GetComponent<CustomGravity>();
-        var playerVelocity = player.GetComponent<PlayerVelocityManager>();
-        playerVelocity.ResetSpeed(originalVelocity);
-        customGravity.timeScale = 1;
+        var playerVelocity = player.GetComponent<PlayerMovementManager>();
+        playerVelocity.ResetSpeed();
+        customGravity.TimeScale = 1;
 
     }
 }

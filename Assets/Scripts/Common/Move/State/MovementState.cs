@@ -5,33 +5,86 @@ using UnityEngine;
 
 public interface IMovementState
 {
-    void HandleInput(HandleManager handleManager);
+    void HandleInput(HandleManager mgr);
     void ExecuteMovement(Rigidbody playerRb);
-    void TryPlayAnimation(HandleManager animator);
+    void TryPlayAnimation(HandleManager mgr);
 }
 
 public class JumpState : IMovementState
 {
-    public void HandleInput(HandleManager handleManager)
+    public void HandleInput(HandleManager mgr)
     {
-        AnimationUtil.IdleWhenGround(handleManager);
+        if (AnimationUtil.IsAnimationEnd(mgr.animator, AnimationHash.JUMP))
+        {
+            if (AnimationUtil.AirboneWhenOnAir(mgr))
+                return;
+        }
+
+        if (PlayerMovementManager.Instance.IsCurrentJumpState(CurrentJumpState.Grounded))
+        {
+            if (AnimationUtil.LandWhenGround(mgr))
+                return;
+        }
     }
 
     public void ExecuteMovement(Rigidbody playerRb)
     {
-        AnimationUtil.DoJumpWhenSpaceAndGrounded(playerRb);
+        ChrMovementUtil.DoJumpWhenSpaceAndGrounded(playerRb);
     }
 
     public void TryPlayAnimation(HandleManager mgr)
     {
-        AnimationUtil.TryGetAndChangeAnimState(mgr, AnimationHash.JUMP);
+        AnimationUtil.TryGetAndChangeAnimState(mgr, AnimationHash.JUMP, 0.2f);
     }
 }
+
+
+public class AirboneState : IMovementState
+{
+    public void HandleInput(HandleManager mgr)
+    {
+        if (AnimationUtil.LandWhenGround(mgr))
+            return;
+    }
+
+    public void ExecuteMovement(Rigidbody playerRb)
+    {
+    }
+
+    public void TryPlayAnimation(HandleManager mgr)
+    {
+        if (AnimationUtil.ReapeatAnimation(mgr, AnimationHash.AIRBONE)) 
+            return;
+        AnimationUtil.TryGetAndChangeAnimState(mgr, AnimationHash.AIRBONE);
+    }
+}
+
+public class LandState : IMovementState
+{
+    public void HandleInput(HandleManager mgr)
+    {
+        if (AnimationUtil.IsAnimationEnd(mgr.animator, AnimationHash.LAND))
+        {
+            if (AnimationUtil.IdleWhenGround(mgr))
+                return;
+        }
+    }
+
+    public void ExecuteMovement(Rigidbody playerRb)
+    {
+    }
+
+    public void TryPlayAnimation(HandleManager mgr)
+    {
+        AnimationUtil.TryGetAndChangeAnimState(mgr, AnimationHash.LAND);
+    }
+}
+
 public class PrayingState : IMovementState
 {
-    public void HandleInput(HandleManager handleManager)
+    public void HandleInput(HandleManager mgr)
     {
-        if (AnimationUtil.IdleWhenNoMove_NoMouse1(handleManager))
+        if (AnimationUtil.IdleWhenNoMove_NoMouse1(mgr))
             return;
     }
 
@@ -51,22 +104,23 @@ public class PrayingState : IMovementState
 
 public class RunState : IMovementState
 {
-    public void HandleInput(HandleManager handleManager)
+    public void HandleInput(HandleManager mgr)
     {
-        if (AnimationUtil.JumpWhenSpaceAndGrounded(handleManager)) 
+        if (AnimationUtil.AirboneWhenOnAir(mgr))
+            return;
+        if (AnimationUtil.JumpWhenSpaceAndGrounded(mgr)) 
             return;
         // if (AnimationUtil.PrayingWhenMouse1(handleManager))
         //     return;
-        if (AnimationUtil.WalkWhenMovingButNoShift(handleManager))
+        if (AnimationUtil.WalkWhenMovingButNoShift(mgr))
             return;
-        if (AnimationUtil.IdleWhenNoMove(handleManager))
+        if (AnimationUtil.IdleWhenNoMove(mgr))
             return;
     }
 
     public void ExecuteMovement(Rigidbody playerRb)
     {
-        var moveDir = HandleManager.Instance.moveDir * HandleManager.Instance.speedMultiplier;
-        AnimationUtil.DoMove(playerRb, moveDir);
+        PlayerMovementManager.Instance.DoRun();
     }
 
     public void TryPlayAnimation(HandleManager mgr)
@@ -81,23 +135,25 @@ public class RunState : IMovementState
 
 public class WalkState : IMovementState
 {
-    public void HandleInput(HandleManager handleManager)
+    public void HandleInput(HandleManager mgr)
     {
-        if (AnimationUtil.JumpWhenSpaceAndGrounded(handleManager)) 
+        if (AnimationUtil.AirboneWhenOnAir(mgr))
+            return;
+        
+        if (AnimationUtil.JumpWhenSpaceAndGrounded(mgr)) 
             return;
 
-        if (AnimationUtil.RunWhenMovingAndShift(handleManager)) 
+        if (AnimationUtil.RunWhenMovingAndShift(mgr)) 
             return;
 
-        if (AnimationUtil.IdleWhenNoMove(handleManager))
+        if (AnimationUtil.IdleWhenNoMove(mgr))
             return;
 
     }
 
     public void ExecuteMovement(Rigidbody playerRb)
     {
-        var moveDir = HandleManager.Instance.moveDir;
-        AnimationUtil.DoMove(playerRb, moveDir);
+        PlayerMovementManager.Instance.DoMove();
     }
 
 
@@ -113,26 +169,31 @@ public class WalkState : IMovementState
 
 public class IdleState : IMovementState
 {
-    public void HandleInput(HandleManager handleManager)
+    public void HandleInput(HandleManager mgr)
     {
-        if (AnimationUtil.JumpWhenSpaceAndGrounded(handleManager))
-            return;
-       
-        if (AnimationUtil.RunWhenMovingAndShift(handleManager)) 
+        if (AnimationUtil.AirboneWhenOnAir(mgr))
             return;
         
-        if(AnimationUtil.WalkWhenMoving(handleManager))
+        if (AnimationUtil.JumpWhenSpaceAndGrounded(mgr))
+            return;
+       
+        if (AnimationUtil.RunWhenMovingAndShift(mgr)) 
+            return;
+        
+        if (AnimationUtil.WalkWhenMoving(mgr))
             return;
             
     }
 
     public void ExecuteMovement(Rigidbody playerRb)
     {
+        // Do nothing
     }
 
     public void TryPlayAnimation(HandleManager mgr)
     {
-        if (AnimationUtil.ReapeatAnimation(mgr, AnimationHash.IDLE)) return;
+        if (AnimationUtil.ReapeatAnimation(mgr, AnimationHash.IDLE)) 
+            return;
 
         AnimationUtil.TryGetAndChangeAnimState(mgr, AnimationHash.IDLE);
 
